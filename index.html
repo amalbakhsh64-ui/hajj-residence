@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HAJJ RESIDENCE – سكن الحجاج</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@500;600&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07140f;--panel:rgba(8,22,17,.88);--gold:#c9a96e;--gold2:#e4c891;--ink:#f3ede2;--mute:rgba(243,237,226,.66);--line:rgba(201,169,110,.3)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none;background:var(--bg);color:var(--ink);font-family:'Tajawal',system-ui,sans-serif}
+button{font-family:inherit;color:inherit}
+header{position:fixed;top:0;right:0;left:0;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:30;background:linear-gradient(rgba(4,12,9,.75),rgba(4,12,9,0));pointer-events:none}
+header>*{pointer-events:auto}
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer}
+.logo .mark{width:28px;height:28px;border:1px solid var(--gold);display:grid;place-items:center;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--gold)}
+.logo b{font-family:'Cormorant Garamond',serif;font-weight:600;letter-spacing:4px;font-size:15px}
+.logo i{font-style:normal;font-size:12px;color:var(--mute);border-inline-start:1px solid var(--line);padding-inline-start:11px}
+.cta{all:unset;cursor:pointer;background:var(--gold);color:#1a1408;font-weight:700;font-size:13px;padding:8px 16px;text-align:center}
+.cta:hover{background:var(--gold2)}
+.ghost{all:unset;cursor:pointer;border:1px solid var(--line);background:rgba(8,22,17,.6);font-size:13px;padding:8px 14px;text-align:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.ghost:hover{border-color:var(--gold)}
+
+#view{position:fixed;inset:0;cursor:grab;touch-action:none}
+#view.drag{cursor:grabbing}
+#view canvas{display:block}
+#pins{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.pin{position:absolute;left:0;top:0;will-change:transform;pointer-events:auto;cursor:pointer;transition:opacity .25s}
+.pin>*{position:absolute;left:0;transform:translateX(-50%)}
+.pin .dot{top:-6px;width:12px;height:12px;border-radius:50%;background:var(--gold2);border:2px solid #fff;animation:pl 2.2s infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(228,200,145,.7)}100%{box-shadow:0 0 0 14px rgba(228,200,145,0)}}
+.pin .stem{bottom:6px;width:1px;height:22px;background:linear-gradient(rgba(255,255,255,.9),rgba(255,255,255,.2))}
+.pin .tag{bottom:28px;display:flex;align-items:center;gap:7px;white-space:nowrap;padding:5px 10px 5px 8px;background:rgba(8,22,17,.82);border:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .2s,transform .2s}
+.pin .tag b{font-family:'Amiri',serif;font-size:17px;font-weight:700;line-height:1}
+.pin .tag small{font-size:10.5px;color:var(--gold2);border-inline-start:1px solid var(--line);padding-inline-start:7px}
+.pin .tag em{font-style:normal;font-size:10px;color:#1a1408;background:var(--mute);padding:1px 6px}
+.pin:hover .tag{background:rgba(31,92,74,.92)}
+.pin.entry .tag{background:rgba(31,92,74,.88);border-color:rgba(159,224,194,.45)}
+.pin.entry .tag b{font-family:'Tajawal',sans-serif;font-size:12.5px}
+.pin.entry .door{font-size:13px;color:#9fe0c2}
+.pin.entry .stem{height:14px}.pin.entry .tag{bottom:20px}
+.pin.entry .dot{background:#9fe0c2;width:10px;height:10px;top:-5px}
+.pin.soon .dot{background:#9a9a9a;animation:none}
+
+.intro{position:fixed;top:72px;right:24px;z-index:6;max-width:320px;background:var(--panel);border:1px solid var(--line);padding:14px 16px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:opacity .4s}
+.intro small{font-size:11px;letter-spacing:1.4px;color:var(--gold2)}
+.intro h1{margin:3px 0 4px;font-family:'Amiri',serif;font-size:30px;line-height:1.1}
+.intro p{margin:0;font-size:12.5px;line-height:1.7;color:var(--mute)}
+.intro .note{margin-top:8px;font-size:10.5px;color:rgba(243,237,226,.45)}
+.intro .x{position:absolute;top:6px;left:8px;all:unset;cursor:pointer;font-size:16px;color:var(--mute);position:absolute}
+#jump{position:fixed;bottom:18px;right:50%;transform:translateX(50%);z-index:6;display:flex;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#jump button{all:unset;cursor:pointer;padding:9px 16px;font-size:13.5px;display:flex;gap:6px;align-items:center;border-inline-end:1px solid rgba(201,169,110,.15)}
+#jump button:last-child{border:none}
+#jump button:hover{background:rgba(201,169,110,.14)}
+#jump button em{font-style:normal;font-size:10px;color:var(--gold2)}
+.zoom{position:fixed;bottom:18px;left:24px;z-index:6;display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel)}
+.zoom button{all:unset;cursor:pointer;width:36px;height:34px;display:grid;place-items:center;font-size:18px}
+.zoom button+button{border-top:1px solid var(--line)}
+
+/* tour */
+#tZ{bottom:auto;top:50%;transform:translateY(-50%)}
+#tour{position:fixed;inset:0;z-index:20;background:#000;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s}
+#tour.on{opacity:1;visibility:visible}
+#tStage{position:absolute;inset:0;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#tStage.drag{cursor:grabbing}
+#tStill{position:absolute;inset:0;display:none;overflow:hidden;background:#05100c}
+#tStill.on{display:block;animation:stIn .7s ease}
+@keyframes stIn{from{opacity:0}to{opacity:1}}
+#tStill .bg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(28px) brightness(.4)}
+#tStill img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:transform .9s cubic-bezier(.5,0,.3,1),opacity .6s ease .15s,filter .6s ease .15s}
+#tStill.go img{transform:scale(1.35);opacity:0;filter:blur(4px)}
+#tStill.go .sp{opacity:0}
+#tStill .sp{position:absolute;inset:0;z-index:5;transition:opacity .25s}
+#tStill .sp .pin{position:absolute;left:0;top:0}
+#tPins{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden;transition:opacity .5s}
+#tPins .pin{transition:opacity .2s}
+.pin.hot .tag{background:rgba(201,169,110,.92);color:#1a1408;border-color:var(--gold2)}
+.pin.hot .tag b{font-family:'Tajawal',sans-serif;font-size:13px}
+.pin.hot .door{font-weight:700}
+.pin.wc .tag{background:rgba(8,22,17,.86);border-color:var(--line)}
+.pin.wc .door{color:var(--gold2)}
+.pin.wc .dot{background:var(--gold2)}
+#tStage canvas{transition:opacity 1.1s ease,filter 1.6s ease}
+#tStage.veil canvas{opacity:0;filter:blur(8px)}
+#tStage canvas,#view canvas{display:block;touch-action:none}
+#tour,#view{overscroll-behavior:none}
+#tPhoto{position:absolute;inset:0;display:none;place-items:center;background:#05100c}
+#tPhoto.on{display:grid}
+#tPhoto img,#tPhoto video{max-width:100%;max-height:100%;object-fit:contain}
+#tFlat{position:absolute;inset:0;display:none;overflow:hidden;cursor:grab;touch-action:pan-y}
+#tFlat.on{display:block}
+#tFlat img{position:absolute;top:0;left:0;height:100%;width:auto;max-width:none;pointer-events:none}
+.tTop{position:absolute;top:70px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;z-index:3;pointer-events:none}
+.tTop>*{pointer-events:auto}
+#back{font-size:13.5px;padding:9px 16px}
+#tInfo{max-width:300px;background:var(--panel);border:1px solid var(--line);padding:12px 14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#tInfo small{font-size:11px;letter-spacing:1.3px;color:var(--gold2)}
+#tInfo h2{margin:2px 0 4px;font-family:'Amiri',serif;font-size:26px;line-height:1.1}
+#tInfo p{margin:0;font-size:12px;line-height:1.7;color:var(--mute)}
+#tInfo .note{margin-top:6px;font-size:10.5px;color:rgba(243,237,226,.45)}
+#tInfo .hint{margin-top:6px;font-size:11px;color:var(--gold2)}
+.tBar{position:absolute;bottom:0;left:0;right:0;padding:40px 24px 18px;background:linear-gradient(transparent,rgba(3,10,7,.85));z-index:3;display:flex;justify-content:space-between;align-items:flex-end;gap:14px}
+.tBar h3{margin:0;font-family:'Amiri',serif;font-size:28px}
+#tTabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#tTabs button{all:unset;cursor:pointer;font-size:12.5px;padding:7px 12px;border:1px solid var(--line);background:rgba(8,22,17,.6);white-space:nowrap}
+#tTabs button.on{background:var(--gold);color:#1a1408;font-weight:700;border-color:var(--gold)}
+#nav{display:flex;gap:2px;background:rgba(8,22,17,.55);border:1px solid var(--line);padding:3px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#nav button{all:unset;cursor:pointer;font-size:13px;padding:7px 13px;color:var(--mute);white-space:nowrap;transition:background .2s,color .2s}
+#nav button:hover{color:var(--ink)}
+#nav button.on{background:var(--gold);color:#1a1408;font-weight:700}
+#sec{position:fixed;inset:0;z-index:25;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 30%,#123226 0%,#07140f 70%);opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s;padding:90px 20px 30px}
+#sec.on{opacity:1;visibility:visible}
+.secBox{max-width:520px;text-align:center}
+.secBox small{font-size:11.5px;letter-spacing:1.6px;color:var(--gold2)}
+.secBox h2{margin:6px 0 10px;font-family:'Amiri',serif;font-size:44px;line-height:1.15}
+.secBox p{margin:0 0 18px;font-size:14.5px;line-height:1.85;color:var(--mute)}
+.soonB{display:inline-block;font-size:12.5px;padding:5px 14px;border:1px solid var(--line);color:var(--gold2);margin-bottom:22px}
+.secBox .ghost{display:block;width:max-content;margin:0 auto}
+#secList{display:grid;gap:10px;margin:0 auto 20px;max-width:440px}
+.hcard{all:unset;cursor:pointer;display:flex;gap:12px;align-items:center;text-align:right;background:rgba(8,22,17,.7);border:1px solid var(--line);padding:8px;transition:border-color .2s,background .2s}
+.hcard:hover{border-color:var(--gold);background:rgba(31,92,74,.45)}
+.hcard img{width:120px;height:72px;object-fit:cover;flex:none}
+.hcard b{display:block;font-family:'Amiri',serif;font-size:20px}
+.hcard small{display:block;font-size:11.5px;color:var(--mute);margin:2px 0 4px}
+.hcard em{font-style:normal;font-size:12px;color:var(--gold2)}
+#picker{position:fixed;inset:0;z-index:35;background:rgba(3,10,7,.62);display:grid;place-items:center;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s;padding:16px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#picker.on{opacity:1;visibility:visible}
+.pk{position:relative;width:min(720px,100%);background:var(--panel);border:1px solid var(--line);padding:18px}
+.pk small{font-size:11px;letter-spacing:1.3px;color:var(--gold2)}
+.pk h3{margin:2px 0 12px;font-family:'Amiri',serif;font-size:26px}
+.pk .x{all:unset;cursor:pointer;position:absolute;top:8px;left:12px;font-size:20px;color:var(--mute)}
+.pkGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pkc{all:unset;cursor:pointer;display:block;border:1px solid var(--line);background:rgba(8,22,17,.6);transition:border-color .2s,transform .2s}
+.pkc:hover{border-color:var(--gold);transform:translateY(-2px)}
+.pkc.on{border-color:var(--gold2);box-shadow:0 0 0 1px var(--gold2)}
+.pkc img{display:block;width:100%;aspect-ratio:22/15;object-fit:cover}
+.pkc b{display:block;padding:8px 10px 0;font-size:14.5px}
+.pkc small{display:block;padding:2px 10px 10px;font-size:12px;color:var(--mute);letter-spacing:0}
+@media (max-width:640px){.pkGrid{grid-template-columns:1fr}.pkc{display:flex;align-items:center}.pkc img{width:110px;flex:none}}
+#toast{position:fixed;top:72px;right:50%;transform:translateX(50%);z-index:40;background:var(--panel);border:1px solid var(--line);padding:9px 16px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none}
+#toast.on{opacity:1}
+#loader{position:fixed;inset:0;background:var(--bg);z-index:100;display:grid;place-items:center;transition:opacity .8s}
+#loader b{font-family:'Amiri',serif;font-size:28px;color:var(--gold2)}
+@media (max-width:820px){
+  header{flex-direction:column;align-items:stretch;height:auto;gap:6px;padding:8px 10px}
+  #nav{overflow-x:auto;scrollbar-width:none}#nav::-webkit-scrollbar{display:none}#nav button{font-size:12px;padding:6px 10px}
+  .secBox h2{font-size:30px}
+  header{padding:0 14px;height:54px}.logo i{display:none}
+  .intro{top:60px;right:10px;left:10px;max-width:none;padding:10px 12px}.intro h1{font-size:22px}.intro p{font-size:11.5px}
+  #jump{bottom:10px}#jump button{padding:8px 11px;font-size:12.5px}
+  .zoom{bottom:62px;left:10px}
+  .pin .tag b{font-size:14px}.pin .tag{padding:4px 8px 4px 6px}.pin .tag small{display:none}
+  .tTop{top:60px;left:10px;right:10px;flex-direction:column}
+  #tInfo{max-width:none;padding:9px 11px}#tInfo h2{font-size:20px}#tInfo p{display:none}
+  .tBar{flex-direction:column;align-items:stretch;padding:30px 10px 10px}.tBar h3{font-size:20px}
+  #tTabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start}
+}
+@media (max-width:820px){header{height:auto!important;padding:8px 10px!important}#nav{flex:none}.intro{top:96px!important}.tTop{top:96px!important}}
+</style>
+</head>
+<body>
+<div id="loader"><b>المشاعر المقدسة</b></div>
+<header>
+  <div class="logo" id="home"><div class="mark">H</div><b>HAJJ RESIDENCE</b><i>سكن الحجاج</i></div>
+  <nav id="nav">
+    <button data-sec="mashaer" class="on">المشاعر المقدسة</button>
+    <button data-sec="makkah">فنادق مكة المكرمة</button>
+    <button data-sec="madinah">فنادق المدينة المنورة</button>
+    <button data-sec="ziyarat">المزارات</button>
+  </nav>
+</header>
+
+<div id="view"></div>
+<div id="pins"></div>
+<div class="intro" id="intro">
+  <button class="x" id="introX" aria-label="إخفاء">×</button>
+  <small>جولة 360° · مكة المكرمة</small>
+  <h1>المشاعر المقدسة</h1>
+  <p>اسحب للدوران، وقرّب أو بعّد بالعجلة أو بإصبعين. اضغط على اسم المشعر لفتح جولته.</p>
+  <div class="note">هذه الصورة محاكاة توضيحية بتوزيع تقريبي.</div>
+</div>
+<div id="jump"></div>
+<div class="zoom"><button id="zin" aria-label="تقريب">+</button><button id="zout" aria-label="إبعاد">−</button></div>
+
+<section id="tour">
+  <div id="tStage"></div>
+  <div id="tPins"></div>
+  <div id="tFlat"></div>
+  <div id="tStill"><div class="bg"></div><img alt="بوابة مخيم منى"><div class="sp"></div></div>
+  <div id="tPhoto"></div>
+  <div class="tTop">
+    <div style="display:flex;gap:6px"><button class="ghost" id="roomsBtn" style="display:none">أنواع الغرف</button><button class="ghost" id="back">→ العودة إلى المشاعر</button><button class="ghost" id="fsT" aria-label="ملء الشاشة" title="ملء الشاشة">⛶</button></div>
+    <div id="tInfo"><small id="tK"></small><h2 id="tT"></h2><p id="tP"></p><div class="hint" id="tH"></div><div class="note" id="tN">محاكاة توضيحية بتوزيع تقريبي.</div></div>
+  </div>
+  <div class="zoom" id="tZ" style="z-index:4"><button id="tzin" aria-label="تقريب">+</button><button id="tzout" aria-label="إبعاد">−</button></div>
+  <div class="tBar"><h3 id="tS"></h3><div id="tTabs"></div></div>
+</section>
+<section id="sec"><div class="secBox">
+  <small id="secK"></small><h2 id="secT"></h2><p id="secP"></p>
+  <div id="secList"></div>
+  <div class="soonB" id="secSoon">قريبًا</div>
+  <button class="ghost" id="secBack">→ العودة إلى المشاعر المقدسة</button>
+</div></section>
+<div id="picker"><div class="pk">
+  <button class="x" id="pkX" aria-label="إغلاق">×</button>
+  <small>فندق سجى المدينة</small><h3>اختر نوع الغرفة</h3>
+  <div class="pkGrid" id="pkGrid"></div>
+</div></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const MEDIA={"hub": "img/hub.jpg", "arafat_tent": "img/arafat_tent.jpg", "arafat_hall": "img/arafat_hall.jpg", "wc_ext": "img/wc_ext.jpg", "wc_int": "img/wc_int.jpg", "muz": "img/muz.jpg", "mina_gate": "img/mina_gate.jpg", "mina_walk": "img/mina_walk.jpg", "saja_ext": "img/saja_ext.jpg", "saja_lobby": "img/saja_lobby.jpg", "saja_double": "img/saja_double.jpg", "saja_triple": "img/saja_triple.jpg", "saja_quad": "img/saja_quad.jpg", "saja_double_th": "img/saja_double_th.jpg", "saja_triple_th": "img/saja_triple_th.jpg", "saja_quad_th": "img/saja_quad_th.jpg"};
+const $=id=>document.getElementById(id);
+const IW=1774,IH=887;
+
+/* ---------- mashaer pins (image pixel coords of the anchor point) ---------- */
+const MASHAER=[
+ {id:'mina',name:'منى',sub:'يوم التروية · أيام التشريق',px:[340,505]},
+ {id:'muzdalifah',name:'مزدلفة',sub:'المبيت · جمع الحصى',px:[945,560]},
+ {id:'arafat',name:'عرفات',sub:'يوم عرفة',px:[1560,560]},
+];
+const ENTRIES=[{tour:'mina',scene:0,name:'مخيمات منى',px:[250,625]},
+ {tour:'wc_mina',scene:0,name:'دورات المياه',px:[560,650],icon:'🚻',cls:'wc'},
+ {tour:'wc_arafat',scene:0,name:'دورات المياه',px:[1455,650],icon:'🚻',cls:'wc'}];
+function WC(){return [
+ {name:'الساحة الخارجية',type:'pano',src:'wc_ext',yaw:700/IW*360,pitch:-4,fov:75,fade:true,note:'محاكاة بانورامية توضيحية.',hint:'اسحب للنظر حولك · اضغط النقطة للدخول',
+  hot:[{label:'الدخول إلى دورات المياه',px:[548,455],to:1,icon:'→'}]},
+ {name:'داخل دورات المياه',type:'pano',src:'wc_int',yaw:1010/IW*360,pitch:-4,fov:75,fade:true,note:'محاكاة بانورامية توضيحية.',hint:'اسحب لاستكشاف الكبائن والمغاسل',
+  hot:[{label:'العودة للخارج',px:[822,470],to:0,icon:'←'}]}];}
+/* ---------- tours: only the content we actually have ---------- */
+const TOURS={
+ mina:{k:'المشعر الأول',name:'منى',desc:'جولة في مخيم منى: البوابة، والممرات والجلسات، ومخيمات منى من الداخل.',
+   scenes:[
+    {name:'بوابة مخيم منى',type:'still',src:'mina_gate',note:'صورة توضيحية للبوابة.',hint:'اضغط «دخول المخيم»',
+     hot:[{label:'دخول المخيم',pct:[50.2,62],to:1,icon:'→'}]},
+    {name:'الممرات والجلسات',type:'pano',src:'mina_walk',yaw:180,pitch:-6,fov:75,fade:true,note:'محاكاة بانورامية توضيحية.',hint:'اسحب للنظر حولك · قرّب وبعّد',
+     hot:[{label:'دخول مخيمات منى',px:[1335,452],to:2,icon:'→'},{label:'العودة إلى البوابة',px:[112,420],to:0,icon:'←'}]},
+    {name:'مخيمات منى',type:'pano',src:'arafat_hall',fade:true,hot:[{label:'العودة إلى الممرات والجلسات',px:[882,440],to:1,icon:'←',from:1}],cine:true,yaw:178.6,pitch:-2,fov:72,note:'محاكاة بانورامية مستوحاة من صورة للمخيم.',hint:'اسحب للنظر حولك · قرّب وبعّد'},
+   ]},
+ arafat:{k:'الركن الأعظم',name:'عرفات',desc:'خيمة من مخيمات عرفة: كراسي الاسترخاء، والتكييف، وركن المياه.',
+   scenes:[
+           {name:'مخيمات عرفة',type:'pano',src:'arafat_tent',hint:'اسحب للنظر حولك · قرّب وبعّد'}]},
+ muzdalifah:{k:'المشعر الحرام',name:'مزدلفة',desc:'ساحة المبيت أمام مسجد المشعر الحرام: الفرشات ومغاسل الوضوء والإنارة الليلية.',
+   scenes:[{name:'ساحة المبيت',type:'pano',src:'muz',yaw:180,pitch:-4,fov:80,cine:true,auto:true,note:'محاكاة بانورامية توضيحية.',hint:'اسحب للنظر حولك · قرّب وبعّد'}]},
+ saja:{k:'فنادق المدينة المنورة',name:'فندق سجى المدينة',desc:'جولة في فندق سجى من وارويك: الواجهة، واللوبي والاستقبال، وغرف الإقامة.',back:'العودة إلى فنادق المدينة',backSec:'madinah',rooms:[2,3,4],
+   scenes:[
+    {name:'الواجهة الخارجية',type:'still',src:'saja_ext',note:'صورة توضيحية للواجهة.',hint:'اضغط «دخول الفندق»',hot:[{label:'دخول الفندق',pct:[49.7,85],to:1,icon:'→'}]},
+    {name:'اللوبي والاستقبال',type:'pano',src:'saja_lobby',yaw:180,pitch:-4,fov:78,fade:true,cine:true,note:'محاكاة بانورامية توضيحية.',hint:'اسحب للنظر حولك · قرّب وبعّد',hot:[{label:'استكشف غرف الإقامة',px:[890,470],act:'rooms',icon:'⌂'},{label:'الخروج إلى الواجهة',px:[60,470],to:0,icon:'←'}]},
+    {name:'غرفة ثنائية',type:'pano',src:'saja_double',yaw:180,pitch:-8,fov:92,fade:true,note:'محاكاة بانورامية توضيحية.',hint:'سريران منفصلان · اسحب لاستكشاف الغرفة',hot:[{label:'العودة إلى اللوبي',px:[165,470],to:1,icon:'←'}]},
+    {name:'غرفة ثلاثية',type:'pano',src:'saja_triple',yaw:180,pitch:-8,fov:92,fade:true,note:'محاكاة بانورامية توضيحية.',hint:'ثلاثة أسرّة · اسحب لاستكشاف الغرفة',hot:[{label:'العودة إلى اللوبي',px:[212,455],to:1,icon:'←'}]},
+    {name:'غرفة رباعية',type:'pano',src:'saja_quad',yaw:180,pitch:-8,fov:92,fade:true,note:'محاكاة بانورامية توضيحية.',hint:'أربعة أسرّة · اسحب لاستكشاف الغرفة',hot:[{label:'العودة إلى اللوبي',px:[88,480],to:1,icon:'←'}]}]},
+ wc_mina:{k:'منى · المرافق',name:'دورات المياه',desc:'دورات المياه ومغاسل الوضوء المظللة بالقرب من مخيمات منى.',back:'العودة إلى منى',region:'mina',scenes:WC()},
+ wc_arafat:{k:'عرفات · المرافق',name:'دورات المياه',desc:'دورات المياه ومغاسل الوضوء المظللة بالقرب من مخيمات عرفات.',back:'العودة إلى عرفات',region:'arafat',scenes:WC()},
+};
+
+/* ---------- generic sphere viewer ---------- */
+function makeSphere(host,opts){
+  const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,1.75));R.outputEncoding=THREE.sRGBEncoding;host.appendChild(R.domElement);
+  const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(opts.fov,1,.1,1100);
+  const geo=new THREE.SphereGeometry(500,128,64);geo.scale(-1,1,1);const mat=new THREE.MeshBasicMaterial();scene.add(new THREE.Mesh(geo,mat));
+  // yaw 0 = image left edge; yaw increases to the right through the image (degrees = u*360)
+  const S={yaw:180,pitch:0,fov:opts.fov,tFov:opts.fov,minF:opts.minF||30,maxF:opts.maxF||100,vy:0,vp:0,drag:null,active:true,anim:null};
+  S.dir=(yaw,pitch)=>{const phi=yaw*Math.PI/180,t=(90-pitch)*Math.PI/180;return new THREE.Vector3(Math.cos(phi)*Math.sin(t),Math.cos(t),Math.sin(phi)*Math.sin(t));};
+  S.pxDir=(x,y)=>S.dir(x/IW*360,90-y/IH*180);
+  function size(){const w=host.clientWidth||innerWidth,h=host.clientHeight||innerHeight;R.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();}
+  size();addEventListener('resize',size);
+  S.set=src=>new Promise(res=>{const im=new Image();im.onload=()=>{const t=new THREE.Texture(im);t.encoding=THREE.sRGBEncoding;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=R.capabilities.getMaxAnisotropy();t.needsUpdate=true;mat.map=t;mat.needsUpdate=true;res();};im.src=src;});
+  // direct-manipulation drag: the spot under the finger stays under the finger (1:1),
+  // release velocity measured over the last ~80 ms, iOS-style exponential inertia.
+  const ptr=new Map();let pinch=0,pinchF=0,hist=[];
+  const degPerPx=()=>S.fov/(host.clientHeight||innerHeight);
+  host.addEventListener('pointerdown',e=>{e.preventDefault();host.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    S.anim=null;S.auto=false;S.vy=S.vp=0;hist=[{t:performance.now(),y:S.yaw,p:S.pitch}];host.classList.add('drag');
+    if(ptr.size===2){const [a,b]=[...ptr.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y);pinchF=S.tFov;}});
+  host.addEventListener('pointermove',e=>{if(!ptr.has(e.pointerId))return;
+    const evs=e.getCoalescedEvents?e.getCoalescedEvents():[];const last=evs.length?evs[evs.length-1]:e;
+    const p=ptr.get(e.pointerId);const dx=last.clientX-p.x,dy=last.clientY-p.y;ptr.set(e.pointerId,{x:last.clientX,y:last.clientY});
+    if(ptr.size>=2){const [a,b]=[...ptr.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch>0){S.tFov=S.fov=Math.max(S.minF,Math.min(S.maxF,pinchF*pinch/d));}hist=[];return;}
+    const k=degPerPx();S.yaw-=dx*k;S.pitch=Math.max(-85,Math.min(85,S.pitch+dy*k));
+    const now=performance.now();hist.push({t:now,y:S.yaw,p:S.pitch});while(hist.length>2&&now-hist[0].t>90)hist.shift();});
+  const up=e=>{if(!ptr.has(e.pointerId))return;ptr.delete(e.pointerId);
+    if(ptr.size===1){const q=[...ptr.values()][0];hist=[{t:performance.now(),y:S.yaw,p:S.pitch}];pinch=0;return;}
+    if(!ptr.size){host.classList.remove('drag');const now=performance.now();
+      if(hist.length>=2&&now-hist[hist.length-1].t<60){const a=hist[0],b=hist[hist.length-1],dt=Math.max(16,b.t-a.t);
+        S.vy=(b.y-a.y)/dt;S.vp=(b.p-a.p)/dt;const cap=.9;S.vy=Math.max(-cap,Math.min(cap,S.vy));S.vp=Math.max(-cap,Math.min(cap,S.vp));}
+      else{S.vy=S.vp=0;}}};
+  host.addEventListener('pointerup',up);host.addEventListener('pointercancel',up);host.addEventListener('lostpointercapture',up);
+  host.addEventListener('contextmenu',e=>e.preventDefault());
+  host.addEventListener('wheel',e=>{e.preventDefault();S.auto=false;S.tFov=Math.max(S.minF,Math.min(S.maxF,S.tFov+e.deltaY*.06));},{passive:false});
+  S.zoom=d=>{S.auto=false;S.tFov=Math.max(S.minF,Math.min(S.maxF,S.tFov+d));};
+  S.goTo=(yaw,pitch,fov,ms=900)=>{const y0=S.yaw,p0=S.pitch,f0=S.tFov;let dy=((yaw-y0)%360+540)%360-180;const t0=performance.now();S.anim=now=>{const k=Math.min((now-t0)/ms,1),e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;S.yaw=y0+dy*e;S.pitch=p0+(pitch-p0)*e;if(fov)S.tFov=S.fov=f0+(fov-f0)*e;if(k>=1)S.anim=null;};};
+  const tg=new THREE.Vector3();let last=performance.now();
+  S.frame=now=>{const dt=Math.min(now-last,50)/16.67;last=now;if(!S.active)return;
+    const ms=dt*16.67;if(S.auto&&!S.anim&&!ptr.size&&!S.vy&&!S.vp)S.yaw+=ms*.0035;if(S.anim)S.anim(now);else if(!ptr.size&&(S.vy||S.vp)){S.yaw+=S.vy*ms;S.pitch+=S.vp*ms;const f=Math.exp(-ms/325);S.vy*=f;S.vp*=f;if(Math.abs(S.vy)<.002&&Math.abs(S.vp)<.002)S.vy=S.vp=0;}
+    if(!ptr.size)S.fov+=(S.tFov-S.fov)*Math.min(1,.35*dt);S.pitch=Math.max(-85,Math.min(85,S.pitch));
+    cam.fov=S.fov;cam.updateProjectionMatrix();cam.lookAt(tg.copy(S.dir(S.yaw,S.pitch)));R.render(scene,cam);opts.after&&opts.after(cam,host);};
+  return S;
+}
+
+/* ---------- hub ---------- */
+const HUB=makeSphere($('view'),{fov:85,minF:35,maxF:105,after:placePins});
+const START={yaw:945/IW*360,pitch:-14,fov:85};
+const pinEls=[],tv=new THREE.Vector3();
+for(const m of MASHAER){const has=!!TOURS[m.id];const el=document.createElement('div');el.className='pin'+(has?'':' soon');
+  el.innerHTML=`<div class="tag"><b>${m.name}</b>${has?`<small>${m.sub}</small>`:'<em>قريبًا</em>'}</div><div class="stem"></div><div class="dot"></div>`;
+  el.addEventListener('pointerdown',e=>e.stopPropagation());el.onclick=()=>openMash(m.id);$('pins').appendChild(el);
+  pinEls.push({el,v:HUB.pxDir(m.px[0],m.px[1]).multiplyScalar(400)});
+  const b=document.createElement('button');b.innerHTML=m.name+(has?'':' <em>قريبًا</em>');b.onclick=()=>{HUB.goTo(m.px[0]/IW*360,-12,70);setTimeout(()=>openMash(m.id),has?950:900);};$('jump').appendChild(b);}
+for(const en of ENTRIES){const el=document.createElement('div');el.className='pin entry';
+  if(en.cls)el.classList.add(en.cls);el.innerHTML=`<div class="tag"><span class="door">${en.icon||'⌂'}</span><b>${en.name}</b><small>ادخل</small></div><div class="stem"></div><div class="dot"></div>`;
+  el.addEventListener('pointerdown',e=>e.stopPropagation());el.onclick=()=>openMash(en.tour,en.scene);$('pins').appendChild(el);
+  pinEls.push({el,v:HUB.pxDir(en.px[0],en.px[1]).multiplyScalar(400)});}
+function placePins(cam,host){const w=host.clientWidth,h=host.clientHeight;
+  for(const p of pinEls){tv.copy(p.v).project(cam);const vis=tv.z<1&&Math.abs(tv.x)<1.15&&Math.abs(tv.y)<1.15;p.el.style.opacity=vis?1:0;p.el.style.pointerEvents=vis?'auto':'none';
+    p.el.style.transform=`translate(${(tv.x+1)/2*w}px,${(1-tv.y)/2*h}px)`;}}
+$('zin').onclick=()=>HUB.zoom(-10);$('zout').onclick=()=>HUB.zoom(10);
+$('introX').onclick=()=>$('intro').style.opacity=0;
+$('home').onclick=()=>{goSec('mashaer');closeTour();HUB.goTo(START.yaw,START.pitch,START.fov);};
+let tt;function toast(s){const t=$('toast');t.textContent=s;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600);}
+const SECS={
+ makkah:{k:'القسم الثاني',t:'فنادق مكة المكرمة',p:'جولات افتراضية داخل فنادق سكن الحجاج في مكة المكرمة: الغرف، والردهات، والمطاعم، والإطلالات.'},
+ madinah:{k:'القسم الثالث',t:'فنادق المدينة المنورة',p:'جولات افتراضية داخل فنادق سكن الحجاج في المدينة المنورة القريبة من المسجد النبوي.',hotels:[{tour:'saja',name:'فندق سجى المدينة',sub:'Saja by Warwick · الواجهة واللوبي و3 أنواع غرف',img:'saja_ext'}]},
+ ziyarat:{k:'القسم الرابع',t:'المزارات',p:'جولات في المزارات التي يزورها الحجاج في مكة المكرمة والمدينة المنورة.'}};
+function goSec(id){document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.sec===id));
+  if(id==='mashaer'){$('sec').classList.remove('on');HUB.active=!$('tour').classList.contains('on');try{history.replaceState(null,'','#');}catch(e){}return;}
+  closeTour();const s=SECS[id];$('secK').textContent=s.k;$('secT').textContent=s.t;$('secP').textContent=s.p;$('secList').innerHTML='';(s.hotels||[]).forEach(h=>{const c=document.createElement('button');c.className='hcard';c.innerHTML=`<img src="${MEDIA[h.img]}" alt=""><span><b>${h.name}</b><small>${h.sub}</small><em>ابدأ الجولة ←</em></span>`;c.onclick=()=>openMash(h.tour);$('secList').appendChild(c);});$('secSoon').style.display=(s.hotels||[]).length?'none':'';
+  $('sec').classList.add('on');HUB.active=false;try{history.replaceState(null,'','#'+id);}catch(e){}}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>goSec(b.dataset.sec));
+$('secBack').onclick=()=>goSec('mashaer');
+
+/* ---------- tour ---------- */
+const TS=makeSphere($('tStage'),{fov:75,minF:30,maxF:100,after:placeTourPins});TS.active=false;
+let tHot=[];const tv2=new THREE.Vector3();
+let curIdx=-1,prevIdx=-1;
+function buildTourPins(s){$('tPins').innerHTML='';tHot=[];(s.hot||[]).filter(h=>h.from===undefined||h.from===prevIdx).forEach(h=>{const el=document.createElement('div');el.className='pin hot';
+  el.innerHTML=`<div class="tag"><span class="door">${h.icon}</span><b>${h.label}</b></div><div class="stem"></div><div class="dot"></div>`;
+  el.addEventListener('pointerdown',e=>e.stopPropagation());el.onclick=()=>{if(h.act==='rooms'){openPicker();return;}TS.auto=false;TS.goTo(h.px[0]/IW*360,90-h.px[1]/IH*180,Math.max(35,TS.tFov-16),520);setTimeout(()=>showScene(h.to),380);};$('tPins').appendChild(el);tHot.push({el,v:TS.pxDir(h.px[0],h.px[1]).multiplyScalar(400)});});}
+function placeTourPins(cam,host){const w=host.clientWidth,h=host.clientHeight;for(const p of tHot){tv2.copy(p.v).project(cam);const vis=tv2.z<1&&Math.abs(tv2.x)<1.15&&Math.abs(tv2.y)<1.15;
+  p.el.style.opacity=vis?1:0;p.el.style.pointerEvents=vis?'auto':'none';p.el.style.transform=`translate(${(tv2.x+1)/2*w}px,${(1-tv2.y)/2*h}px)`;}}
+let curTour=null;
+function openMash(id,sc=0){curIdx=-1;prevIdx=-1;$('sec').classList.remove('on');const T=TOURS[id];if(!T){toast('جولة '+MASHAER.find(m=>m.id===id).name+' قريبًا');return;}
+  $('roomsBtn').style.display=TOURS[id]&&TOURS[id].rooms?'':'none';curTour=T;$('back').textContent='→ '+(T.back||'العودة إلى المشاعر');$('tK').textContent=T.k;$('tT').textContent=T.name;$('tP').textContent=T.desc;
+  $('tTabs').innerHTML='';T.scenes.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.name;b.onclick=()=>showScene(i);$('tTabs').appendChild(b);});
+  $('tTabs').style.display=T.scenes.length>1?'':'none';
+  HUB.active=false;$('pins').style.display='none';$('tour').classList.add('on');showScene(sc);try{history.replaceState(null,'','#'+id);}catch(e){}}
+function closeTour(){TS.auto=false;closePicker();const bs=curTour&&curTour.backSec;if(bs){curTour=null;$('tour').classList.remove('on');TS.active=false;goSec(bs);return;}if(curTour&&curTour.region){const m=MASHAER.find(x=>x.id===curTour.region);HUB.goTo(m.px[0]/IW*360,-12,72,10);}$('tour').classList.remove('on');TS.active=false;const v=$('tPhoto').querySelector('video');if(v)v.pause();HUB.active=true;$('pins').style.display='';try{history.replaceState(null,'','#');}catch(e){}}
+$('back').onclick=closeTour;$('tzin').onclick=()=>TS.zoom(-8);$('tzout').onclick=()=>TS.zoom(8);
+$('fsT').onclick=()=>{try{if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen();}catch(e){}};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&$('tour').classList.contains('on'))closeTour();});
+async function showScene(i){prevIdx=curIdx;curIdx=i;const s=curTour.scenes[i];$('tS').textContent=s.name;$('tH').textContent=s.hint||'';$('tN').textContent=s.note||'محاكاة توضيحية بتوزيع تقريبي.';$('tZ').style.display=s.type==='pano'?'':'none';
+  $('tTabs').querySelectorAll('button').forEach((b,j)=>b.classList.toggle('on',j===i));
+  $('tStage').style.display=s.type==='pano'?'':'none';$('tPhoto').classList.toggle('on',s.type==='photo'||s.type==='video');$('tFlat').classList.toggle('on',s.type==='flat');
+  $('tStill').classList.toggle('on',s.type==='still');if(s.type!=='still')$('tStill').classList.remove('go');
+  $('tPhoto').innerHTML='';if(s.type!=='pano'){TS.active=false;$('tPins').innerHTML='';tHot=[];}
+  if(s.type==='pano'){TS.auto=false;const was=TS.active&&$('tStage').style.display!=='none';$('tStage').classList.add('veil');$('tPins').style.opacity=0;if(s.fade&&was)await new Promise(r=>setTimeout(r,550));TS.active=false;await TS.set(MEDIA[s.src]);buildTourPins(s);setTimeout(()=>$('tPins').style.opacity=1,500);const Y=s.yaw??180,P=s.pitch??0,F=s.fov||75;
+    if(s.cine){TS.yaw=Y-22;TS.pitch=P+6;TS.fov=TS.tFov=F+22;TS.active=true;requestAnimationFrame(()=>{$('tStage').classList.remove('veil');TS.goTo(Y,P,F,2600);if(s.auto)setTimeout(()=>{if(TS.active&&!TS.anim)TS.auto=true;},2700);});}
+    else{TS.yaw=Y;TS.pitch=P;TS.fov=TS.tFov=F;TS.active=true;$('tStage').classList.remove('veil');}}
+  else if(s.type==='still')STILL.show(s);
+  else if(s.type==='photo'){const im=new Image();im.src=MEDIA[s.src];im.alt=s.name;$('tPhoto').appendChild(im);}
+  else if(s.type==='video'){const v=document.createElement('video');v.src=MEDIA[s.src];v.poster=MEDIA[s.poster];v.muted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.setAttribute('playsinline','');$('tPhoto').appendChild(v);v.play().catch(()=>{});}
+  else if(s.type==='flat')FLAT.show(MEDIA[s.src]);}
+const STILL=(()=>{const el=$('tStill'),img=el.querySelector('img'),bg=el.querySelector('.bg'),pins=el.querySelector('.sp');let cur=null;
+  function place(){if(!cur||!img.naturalWidth)return;const W=el.clientWidth,H=el.clientHeight,s=Math.min(W/img.naturalWidth,H/img.naturalHeight),w=img.naturalWidth*s,h=img.naturalHeight*s,x=(W-w)/2,y=(H-h)/2;
+    pins.querySelectorAll('.pin').forEach((p,i)=>{const hh=cur.hot[i];p.style.transform=`translate(${x+w*hh.pct[0]/100}px,${y+h*hh.pct[1]/100}px)`;});}
+  addEventListener('resize',place);
+  return {show(s){cur=s;el.classList.remove('go');img.src=MEDIA[s.src];bg.style.backgroundImage=`url(${MEDIA[s.src]})`;pins.innerHTML='';
+    s.hot.forEach(h=>{const p=document.createElement('div');p.className='pin hot';p.innerHTML=`<div class="tag"><span class="door">${h.icon}</span><b>${h.label}</b></div><div class="stem"></div><div class="dot"></div>`;
+      p.onclick=()=>{img.style.transformOrigin=`${h.pct[0]}% ${h.pct[1]}%`;el.classList.add('go');setTimeout(()=>showScene(h.to),650);};pins.appendChild(p);});
+    if(img.complete)place();else img.onload=place;requestAnimationFrame(place);}};})();
+const ROOMINFO={2:{beds:'سريران منفصلان',th:'saja_double_th'},3:{beds:'3 أسرّة',th:'saja_triple_th'},4:{beds:'4 أسرّة',th:'saja_quad_th'}};
+function openPicker(){const g=$('pkGrid');g.innerHTML='';curTour.rooms.forEach(i=>{const s=curTour.scenes[i],r=ROOMINFO[i];const c=document.createElement('button');c.className='pkc'+(i===curIdx?' on':'');
+  c.innerHTML=`<img src="${MEDIA[r.th]}" alt=""><b>${s.name}</b><small>${r.beds}</small>`;c.onclick=()=>{closePicker();if(i!==curIdx)showScene(i);};g.appendChild(c);});$('picker').classList.add('on');}
+function closePicker(){$('picker').classList.remove('on');}
+$('pkX').onclick=closePicker;$('picker').onclick=e=>{if(e.target.id==='picker')closePicker();};$('roomsBtn').onclick=openPicker;
+const FLAT=(()=>{const el=$('tFlat');let img,x=0,minX=0,d=null;
+  function b(){if(!img||!img.naturalWidth)return;const w=img.naturalWidth*el.clientHeight/img.naturalHeight;minX=Math.min(0,el.clientWidth-w);x=minX===0?(el.clientWidth-w)/2:Math.max(minX,Math.min(0,x));img.style.transform=`translateX(${x}px)`;}
+  el.addEventListener('pointerdown',e=>{d=e.clientX;el.setPointerCapture(e.pointerId);});
+  el.addEventListener('pointermove',e=>{if(d===null||minX===0)return;x=Math.max(minX,Math.min(0,x+e.clientX-d));d=e.clientX;img.style.transform=`translateX(${x}px)`;});
+  el.addEventListener('pointerup',()=>d=null);el.addEventListener('wheel',e=>{if(minX===0)return;e.preventDefault();x=Math.max(minX,Math.min(0,x-(e.deltaX||e.deltaY)));img.style.transform=`translateX(${x}px)`;},{passive:false});
+  addEventListener('resize',b);
+  return {show(src){el.innerHTML='';img=new Image();img.src=src;img.alt='';el.appendChild(img);img.onload=()=>{x=0;b();x=minX/2;b();};}};})();
+
+/* ---------- loop / start ---------- */
+function loop(now){requestAnimationFrame(loop);HUB.frame(now);TS.frame(now);}
+(async()=>{await HUB.set(MEDIA.hub);HUB.yaw=START.yaw;HUB.pitch=START.pitch;HUB.fov=HUB.tFov=START.fov;
+  requestAnimationFrame(loop);$('loader').style.opacity=0;setTimeout(()=>$('loader').remove(),800);
+  const h=location.hash.slice(1);if(TOURS[h])openMash(h);})();
+</script>
+</body>
+</html>
